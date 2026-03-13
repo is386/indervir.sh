@@ -1,0 +1,5 @@
+[build]
+cmd = "go build -o indervirsh ./src/"
+bin = "./indervirsh"
+include_ext = ["go"]
+exclude_dir = [".git", "vendor"]
