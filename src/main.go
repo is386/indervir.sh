@@ -10,30 +10,35 @@ import (
 
 	"github.com/is386/indervir.sh/src/tui"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
-	"github.com/muesli/termenv"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+	"charm.land/log/v2"
+	"charm.land/wish/v2"
+	"charm.land/wish/v2/activeterm"
+	"charm.land/wish/v2/bubbletea"
+	"github.com/charmbracelet/colorprofile"
 	"github.com/charmbracelet/ssh"
-	"github.com/charmbracelet/wish"
-	"github.com/charmbracelet/wish/activeterm"
-	"github.com/charmbracelet/wish/bubbletea"
 )
 
 const (
 	host = "0.0.0.0"
-	port = 22
+	port = 2235
 )
 
 func main() {
+	// Force TrueColor so styles (bold, colors) work over SSH
+	lipgloss.Writer.Profile = colorprofile.TrueColor
+
 	// Generates a new SSH server with the given address, host key, and middleware
-	// First, activeterm rejects connections with out a PTY (terminal)
+	// First, activeterm rejects connections without a PTY (terminal)
 	// Second, bubbletea launches a Bubble Tea TUI app for the SSH session
 	wishServer, err := wish.NewServer(
 		wish.WithAddress(fmt.Sprintf("%s:%d", host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
 		wish.WithMiddleware(
-			bubbletea.Middleware(teaHandler),
+			bubbletea.Middleware(func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+				return tui.InitialModel(), nil
+			}),
 			activeterm.Middleware(),
 		),
 	)
@@ -42,7 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Starts the server inside of a go routine and listens for SIGINT/SIGTERM (ctrl+c)
+	// Starts the server in a goroutine and listens for SIGINT/SIGTERM (ctrl+c)
 	serverDone := make(chan os.Signal, 1)
 	signal.Notify(serverDone, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
@@ -54,7 +59,7 @@ func main() {
 		}
 	}()
 
-	// Graceful Exit
+	// Graceful shutdown
 	<-serverDone
 	log.Info("Stopping SSH server")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -62,19 +67,4 @@ func main() {
 	if err := wishServer.Shutdown(ctx); err != nil {
 		log.Error("Could not stop server", "error", err)
 	}
-}
-
-// Creates a Bubble Tea app for the SSH session
-func teaHandler(sshSession ssh.Session) (tea.Model, []tea.ProgramOption) {
-	// Stylizes the foreground (text) to be green
-	lipgloss.SetColorProfile(termenv.TrueColor)
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
-
-	tuiModel := tui.Model{
-		Style: style,
-	}
-
-	// WithAltScreen makes it so that the app opens in another screen which preserves
-	// your terminal history
-	return tuiModel, []tea.ProgramOption{tea.WithAltScreen()}
 }
