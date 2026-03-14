@@ -45,8 +45,9 @@ func InitialModel() model {
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("34"))
 
 	return model{
-		spinner: s,
-		loading: true,
+		spinner:     s,
+		loading:     false,
+		navSelected: 2,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -228,7 +229,7 @@ func (m model) renderContent(contentWidth int, innerHeight int) string {
 	case "coding":
 		body = m.renderCoding()
 	case "gaming":
-		body = m.renderGaming()
+		body = m.renderGaming(contentWidth)
 	case "reading":
 		body = m.renderReading()
 	case "running":
@@ -290,8 +291,37 @@ func (m model) renderCoding() string {
 	return "coming soon..."
 }
 
-func (m model) renderGaming() string {
-	return "coming soon..."
+func (m model) renderGaming(contentWidth int) string {
+	divider := dim.Render(strings.Repeat("─", contentWidth-4))
+
+	info := strings.Join([]string{
+		m.renderInfoRow("favorite game", "super mario galaxy"),
+		m.renderInfoRow("favorite console", "nintendo gamecube"),
+		m.renderInfoRow("favorite genres", "platformer, metroidvania, soulslike"),
+	}, "\n\n")
+
+	topTen := strings.Join([]string{
+		gray.Render("top ten games\n"),
+		m.renderInfoRow("01.", "super mario galaxy     ") + m.renderInfoRow("02.", "yakuza 0"),
+		m.renderInfoRow("03.", "minecraft              ") + m.renderInfoRow("04.", "tes5: skyrim"),
+		m.renderInfoRow(
+			"05.",
+			"tales of the abyss     ",
+		) + m.renderInfoRow(
+			"06.",
+			"super smash bros melee",
+		),
+		m.renderInfoRow("07.", lipgloss.NewStyle().Hyperlink("https://www.runeprofile.com/1nder").Render("oldschool runescape")+"    ") + m.renderInfoRow("08.", "dark souls"),
+		m.renderInfoRow(
+			"09.",
+			"metal gear solid 2     ",
+		) + m.renderInfoRow(
+			"10.",
+			"tloz: twilight princess",
+		),
+	}, "\n")
+
+	return "\n" + info + "\n\n" + divider + "\n\n" + topTen
 }
 
 func (m model) renderReading() string {
