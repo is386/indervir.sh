@@ -1,4 +1,4 @@
-module github.com/is386/indervir.sh
+module github.com/is386/indervir.dev
 
 go 1.25.8
 
