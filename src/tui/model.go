@@ -46,7 +46,7 @@ func InitialModel() model {
 
 	return model{
 		spinner: s,
-		loading: false,
+		loading: true,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -261,14 +261,26 @@ func (m model) renderContentTitle(contentWidth int, item navItem) string {
 func (m model) renderAbout(contentWidth int) string {
 	divider := dim.Render(strings.Repeat("─", contentWidth-4))
 
-	bio := white.Render("\nhey there - my name is indervir singh. i am a software developer, reader, gamer, and very slow runner.\n")
-	bio += gray.Render("i was randomly inspired to make this page after discovering terminal.shop. its written in golang, using the charm suite of terminal ui libraries.\n")
+	bio := white.Render(
+		"\nhey there - my name is indervir singh. i am a software developer, reader, gamer, and very slow runner.\n",
+	)
+	bio += gray.Render(
+		"i was randomly inspired to make this page after discovering terminal.shop. its written in golang, using the charm suite of terminal ui libraries.\n",
+	)
 
 	info := strings.Join([]string{
 		m.renderInfoRow("location", "new jersey, usa"),
 		m.renderInfoRow("contact", "singh.indervir89@gmail.com"),
-		m.renderInfoRow("github", lipgloss.NewStyle().Hyperlink("https://github.com/is386").Render("is386")),
-		m.renderInfoRow("watch this", lipgloss.NewStyle().Hyperlink("https://youtu.be/gKQOXYB2cd8?si=lmvBPGsDfdDW5LZ-").Render("youtube video")),
+		m.renderInfoRow(
+			"github",
+			lipgloss.NewStyle().Hyperlink("https://github.com/is386").Render("is386"),
+		),
+		m.renderInfoRow(
+			"watch this",
+			lipgloss.NewStyle().
+				Hyperlink("https://youtu.be/gKQOXYB2cd8?si=lmvBPGsDfdDW5LZ-").
+				Render("youtube video"),
+		),
 	}, "\n\n")
 
 	return bio + divider + "\n\n" + info
