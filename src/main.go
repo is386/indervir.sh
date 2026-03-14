@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/is386/indervir.sh/src/tui"
+	"github.com/is386/indervir.dev/src/tui"
 
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"

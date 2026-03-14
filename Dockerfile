@@ -4,13 +4,13 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY src/ src/
-RUN go build -o indervirsh ./src/
+RUN go build -o indervirdev ./src/
 
 FROM alpine:latest
 
 WORKDIR /app
-COPY --from=builder /app/indervirsh .
+COPY --from=builder /app/indervirdev .
 
 EXPOSE 22
 
-CMD ["./indervirsh"]
+CMD ["./indervirdev"]
