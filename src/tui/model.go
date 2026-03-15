@@ -46,8 +46,7 @@ func InitialModel() model {
 
 	return model{
 		spinner:     s,
-		loading:     false,
-		navSelected: 4,
+		loading:     true,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -449,6 +448,7 @@ func (m model) renderRunning(contentWidth int, navItem navItem) string {
 func (m model) renderInfoRow(label string, value string) string {
 	return gray.Render(label+" ") + white.Render(value)
 }
+
 func (m model) renderInfoBox(name string, desc string, link string, navItem navItem) string {
 
 	chevron := lipgloss.NewStyle().
