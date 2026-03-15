@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	white = lipgloss.NewStyle().Foreground(lipgloss.Color("255"))
-	gray  = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
-	dim   = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	black         = lipgloss.NewStyle().Foreground(lipgloss.Color("0"))
+	white         = lipgloss.NewStyle().Foreground(lipgloss.Color("255"))
+	gray          = lipgloss.NewStyle().Foreground(lipgloss.Color("244"))
+	dim           = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	mainTextColor = white
 )
 
 type errMsg error
@@ -45,8 +47,8 @@ func InitialModel() model {
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("34"))
 
 	return model{
-		spinner:     s,
-		loading:     true,
+		spinner: s,
+		loading: true,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -59,9 +61,13 @@ func InitialModel() model {
 
 // Runs once per start up
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.spinner.Tick, tea.Tick(3*time.Second, func(t time.Time) tea.Msg {
-		return loadingDoneMsg{}
-	}))
+	return tea.Batch(
+		tea.RequestBackgroundColor,
+		m.spinner.Tick,
+		tea.Tick(3*time.Second, func(t time.Time) tea.Msg {
+			return loadingDoneMsg{}
+		}),
+	)
 }
 
 // Runs on every event (keypress, window resize, etc)
@@ -85,6 +91,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			return m, nil
 		}
+	case tea.BackgroundColorMsg:
+		if msg.IsDark() {
+			mainTextColor = white
+		} else {
+			mainTextColor = black
+		}
+		return m, nil
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -136,7 +149,7 @@ func (m model) showLoadingScreen() string {
 		AlignVertical(lipgloss.Center).
 		Render(fmt.Sprintf(
 			"%s %s",
-			white.Bold(true).Render("indervir.dev"),
+			mainTextColor.Bold(true).Render("indervir.dev"),
 			m.spinner.View(),
 		))
 }
@@ -202,7 +215,7 @@ func (m model) showMainScreen() string {
 
 func (m model) renderNav() string {
 	var items []string
-	navTitle := white.Bold(true).Render("</> indervir.dev")
+	navTitle := mainTextColor.Bold(true).Render("</> indervir.dev")
 	items = append(items, navTitle)
 	items = append(items, "")
 	for i, nav := range m.navItems {
@@ -261,7 +274,7 @@ func (m model) renderContentTitle(contentWidth int, item navItem) string {
 func (m model) renderAbout(contentWidth int) string {
 	divider := dim.Render(strings.Repeat("─", contentWidth-4))
 
-	bio := white.Render(
+	bio := mainTextColor.Render(
 		"\nhey there - my name is indervir singh. i am a software developer, reader, gamer, and very slow runner.\n",
 	)
 	bio += gray.Render(
@@ -446,7 +459,7 @@ func (m model) renderRunning(contentWidth int, navItem navItem) string {
 }
 
 func (m model) renderInfoRow(label string, value string) string {
-	return gray.Render(label+" ") + white.Render(value)
+	return gray.Render(label+" ") + mainTextColor.Render(value)
 }
 
 func (m model) renderInfoBox(name string, desc string, link string, navItem navItem) string {
@@ -455,7 +468,7 @@ func (m model) renderInfoBox(name string, desc string, link string, navItem navI
 		Foreground(lipgloss.Color(navItem.color)).
 		Render("❯ ")
 
-	return chevron + white.Hyperlink(link).
+	return chevron + mainTextColor.Hyperlink(link).
 		Render(name) +
 		"\n" + gray.Render(
 		desc,
