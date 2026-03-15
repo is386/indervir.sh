@@ -47,7 +47,7 @@ func InitialModel() model {
 	return model{
 		spinner:     s,
 		loading:     false,
-		navSelected: 1,
+		navSelected: 4,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -233,7 +233,7 @@ func (m model) renderContent(contentWidth int, innerHeight int) string {
 	case "reading":
 		body = m.renderReading(contentWidth)
 	case "running":
-		body = m.renderRunning()
+		body = m.renderRunning(contentWidth, navItem)
 	}
 
 	wrappedBody := lipgloss.NewStyle().
@@ -290,34 +290,40 @@ func (m model) renderAbout(contentWidth int) string {
 func (m model) renderCoding(navItem navItem) string {
 
 	projects := strings.Join([]string{
-		m.renderProject(
+		m.renderInfoBox(
 			"game-fella",
 			"nintendo gameboy color emulator written in go",
+			"https://github.com/is386/game-fella",
 			navItem,
 		),
-		m.renderProject(
+		m.renderInfoBox(
 			"nesify",
 			"nes emulator written in go",
+			"https://github.com/is386/nesify",
 			navItem,
 		),
-		m.renderProject(
+		m.renderInfoBox(
 			"strava-frame",
 			"strava data on a diy rpi photoframe, written in python",
+			"https://github.com/is386/strava-frame",
 			navItem,
 		),
-		m.renderProject(
+		m.renderInfoBox(
 			"breakout",
 			"breakout clone written in pico 8, released on itch.io",
+			"https://github.com/is386/breakout",
 			navItem,
 		),
-		m.renderProject(
+		m.renderInfoBox(
 			"seam-carving",
 			"seam carving algorithm written from scratch in python",
+			"https://github.com/is386/seam-carving",
 			navItem,
 		),
-		m.renderProject(
+		m.renderInfoBox(
 			"behavior-tree-mario",
 			"behavior tree agent that plays mario, written in java",
+			"https://github.com/is386/behavior-tree-mario",
 			navItem,
 		),
 	}, "\n\n")
@@ -329,18 +335,6 @@ func (m model) renderCoding(navItem navItem) string {
 		lipgloss.NewStyle().Hyperlink("https://is386.itch.io").Render("my itch.io page")
 
 	return projects + "\n\n" + githubLink + "\n" + itchLink
-}
-
-func (m model) renderProject(name string, desc string, navItem navItem) string {
-	chevron := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(navItem.color)).
-		Render("❯ ")
-
-	return chevron + white.Hyperlink(fmt.Sprintf("https://github.com/is386/%s", name)).
-		Render(name) +
-		"\n" + gray.Render(
-		desc,
-	)
 }
 
 func (m model) renderGaming(contentWidth int) string {
@@ -415,10 +409,55 @@ func (m model) renderReading(contentWidth int) string {
 	return "\n" + info + "\n\n" + divider + "\n\n" + topTen
 }
 
-func (m model) renderRunning() string {
-	return "coming soon..."
+func (m model) renderRunning(contentWidth int, navItem navItem) string {
+	divider := dim.Render(strings.Repeat("─", contentWidth-4))
+
+	info := strings.Join([]string{
+		m.renderInfoRow("1 mi personal record", "08:41"),
+		m.renderInfoRow("5k personal record", "28:20"),
+		m.renderInfoRow("10k personal record", "01:13:59"),
+		m.renderInfoRow("shoes", "asics gel-nimbus 28"),
+	}, "\n\n")
+
+	topTen := strings.Join([]string{
+		m.renderInfoBox(
+			"cherry blossom 5k run",
+			"5k run through washington dc with the rva boys",
+			"https://www.strava.com/activities/11241144654",
+			navItem,
+		),
+		m.renderInfoBox(
+			"philly 10k run",
+			"10k run through the streets of philly with _tehBoss",
+			"https://www.strava.com/activities/12238526744",
+			navItem,
+		),
+		m.renderInfoBox(
+			"mount marcy hike",
+			"16 mile hike up the tallest peak in new york",
+			"https://www.strava.com/activities/15323967438",
+			navItem,
+		),
+		lipgloss.NewStyle().
+			Hyperlink("https://www.strava.com/athletes/65731366").
+			Render("my strava page"),
+	}, "\n\n")
+
+	return "\n" + info + "\n\n" + divider + "\n" + topTen
 }
 
 func (m model) renderInfoRow(label string, value string) string {
 	return gray.Render(label+" ") + white.Render(value)
+}
+func (m model) renderInfoBox(name string, desc string, link string, navItem navItem) string {
+
+	chevron := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(navItem.color)).
+		Render("❯ ")
+
+	return chevron + white.Hyperlink(link).
+		Render(name) +
+		"\n" + gray.Render(
+		desc,
+	)
 }
