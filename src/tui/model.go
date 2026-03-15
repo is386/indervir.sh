@@ -47,7 +47,7 @@ func InitialModel() model {
 	return model{
 		spinner:     s,
 		loading:     false,
-		navSelected: 3,
+		navSelected: 1,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -227,7 +227,7 @@ func (m model) renderContent(contentWidth int, innerHeight int) string {
 	case "about":
 		body = m.renderAbout(contentWidth)
 	case "coding":
-		body = m.renderCoding()
+		body = m.renderCoding(navItem)
 	case "gaming":
 		body = m.renderGaming(contentWidth)
 	case "reading":
@@ -287,8 +287,60 @@ func (m model) renderAbout(contentWidth int) string {
 	return bio + divider + "\n\n" + info
 }
 
-func (m model) renderCoding() string {
-	return "coming soon..."
+func (m model) renderCoding(navItem navItem) string {
+
+	projects := strings.Join([]string{
+		m.renderProject(
+			"game-fella",
+			"nintendo gameboy color emulator written in go",
+			navItem,
+		),
+		m.renderProject(
+			"nesify",
+			"nes emulator written in go",
+			navItem,
+		),
+		m.renderProject(
+			"strava-frame",
+			"strava data on a diy rpi photoframe, written in python",
+			navItem,
+		),
+		m.renderProject(
+			"breakout",
+			"breakout clone written in pico 8, released on itch.io",
+			navItem,
+		),
+		m.renderProject(
+			"seam-carving",
+			"seam carving algorithm written from scratch in python",
+			navItem,
+		),
+		m.renderProject(
+			"behavior-tree-mario",
+			"behavior tree agent that plays mario, written in java",
+			navItem,
+		),
+	}, "\n\n")
+
+	githubLink :=
+		lipgloss.NewStyle().Hyperlink("https://github.com/is386").Render("my github page")
+
+	itchLink :=
+		lipgloss.NewStyle().Hyperlink("https://is386.itch.io").Render("my itch.io page")
+
+	return projects + "\n\n" + githubLink + "\n" + itchLink
+}
+
+func (m model) renderProject(name string, desc string, navItem navItem) string {
+	chevron := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(navItem.color)).
+		Render("❯ ")
+
+	return chevron + white.Hyperlink(fmt.Sprintf("https://github.com/is386/%s", name)).
+		Render(name) +
+		"\n" + gray.Render(
+		desc,
+	)
 }
 
 func (m model) renderGaming(contentWidth int) string {
