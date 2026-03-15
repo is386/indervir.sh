@@ -47,7 +47,7 @@ func InitialModel() model {
 	return model{
 		spinner:     s,
 		loading:     false,
-		navSelected: 2,
+		navSelected: 3,
 		navItems: []navItem{
 			{title: "about", color: "34"},
 			{title: "coding", color: "205"},
@@ -231,7 +231,7 @@ func (m model) renderContent(contentWidth int, innerHeight int) string {
 	case "gaming":
 		body = m.renderGaming(contentWidth)
 	case "reading":
-		body = m.renderReading()
+		body = m.renderReading(contentWidth)
 	case "running":
 		body = m.renderRunning()
 	}
@@ -311,21 +311,56 @@ func (m model) renderGaming(contentWidth int) string {
 			"06.",
 			"super smash bros melee",
 		),
-		m.renderInfoRow("07.", lipgloss.NewStyle().Hyperlink("https://www.runeprofile.com/1nder").Render("oldschool runescape")+"    ") + m.renderInfoRow("08.", "dark souls"),
+		m.renderInfoRow(
+			"07.",
+			"dark souls             ",
+		) + m.renderInfoRow(
+			"08.",
+			"tloz: twilight princess",
+		),
 		m.renderInfoRow(
 			"09.",
 			"metal gear solid 2     ",
 		) + m.renderInfoRow(
-			"10.",
-			"tloz: twilight princess",
+			"10.", "oldschool runescape\n",
 		),
+		lipgloss.NewStyle().
+			Hyperlink("https://www.steamcommunity.com/id/1nder").
+			Render("my steam page"),
+		lipgloss.NewStyle().
+			Hyperlink("https://www.runeprofile.com/1nder").
+			Render("my runeprofile page"),
 	}, "\n")
 
 	return "\n" + info + "\n\n" + divider + "\n\n" + topTen
 }
 
-func (m model) renderReading() string {
-	return "coming soon..."
+func (m model) renderReading(contentWidth int) string {
+	divider := dim.Render(strings.Repeat("─", contentWidth-4))
+
+	info := strings.Join([]string{
+		m.renderInfoRow("favorite book", "oathbringer"),
+		m.renderInfoRow("favorite author", "brandon sanderson"),
+		m.renderInfoRow("favorite genres", "high fantasy, science, sports"),
+	}, "\n\n")
+
+	topTen := strings.Join([]string{
+		gray.Render("top five books/series\n"),
+		m.renderInfoRow(
+			"01.",
+			"the stormlight archive - brandon sanderson",
+		), m.renderInfoRow("02.", "digital minimalism - cal newport"),
+		m.renderInfoRow(
+			"03.",
+			"the lord of the rings - j.r.r tolkien",
+		), m.renderInfoRow("04.", "a short history of nearly everything - bill bryson"),
+		m.renderInfoRow(
+			"05.",
+			"dune - frank herbert\n\n",
+		), lipgloss.NewStyle().Hyperlink("https://app.thestorygraph.com/profile/indervirsingh").Render("my storygraph page"),
+	}, "\n")
+
+	return "\n" + info + "\n\n" + divider + "\n\n" + topTen
 }
 
 func (m model) renderRunning() string {
